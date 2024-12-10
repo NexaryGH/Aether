@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con IA</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #232629;
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Barra lateral */
+        #sidebar {
+            width: 300px;
+            background-color: #16191c;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #f2a365;
+        }
+
+        #newChatButton {
+            padding: 10px;
+            background-color: #4f4fc5;
+            color: #fff;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #newChatButton:hover {
+            background-color: #3e3eaf;
+        }
+
+        /* Área del chat */
+        #chatContainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        #chatMessages {
+            flex: 1;
+            background-color: #1f2428;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            max-width: 70%;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+        }
+
+        .userMessage {
+            background-color: #4f4fc5;
+            color: #ffffff;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .botMessage {
+            background-color: #444;
+            color: #ffffff;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        input[type="text"], button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: #2c3135;
+            color: #ffffff;
+        }
+
+        button {
+            background-color: #f2a365;
+            color: #16191c;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #d68c4b;
+        }
+
+        #micButton {
+            background-color: #f2a365;
+            color: #16191c;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        #micButton i {
+            font-size: 1.5rem;
+        }
+
+        #warningMessage {
+            font-size: 0.9rem;
+            color: #f2a365;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #ttsButton {
+            background-color: #f2a365;
+            color: #16191c;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, transform 0.3s;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        #ttsButton:hover {
+            background-color: #d68c4b;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h2>Conversaciones</h2>
+        <div id="newChatButton">
+            <i class="fas fa-plus"></i> Crear Nuevo Chat
+        </div>
+    </div>
+
+    <div id="chatContainer">
+        <div id="chatMessages"></div>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje...">
+            <button onclick="sendRequest()">
+                <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+            <button id="micButton" onclick="startVoiceRecognition()">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+        <div id="warningMessage">
+            Aether puede cometer algunos errores, verifica la información.
+        </div>
+    </div>
+
+    <script>
+    const API_KEY = 'Api-Key-OpenRouter'; // Reemplaza con tu clave de API
+    let recognition;
+
+    // Configurar reconocimiento de voz
+    function setupVoiceRecognition() {
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'es-ES';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('userInput').value = transcript;
+                sendRequest();  // Enviar la solicitud después de obtener la voz
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Error en el reconocimiento de voz:', event.error);
+            };
+
+            recognition.onend = function() {
+                // Reiniciar el reconocimiento después de que termine
+                console.log('Reconocimiento de voz terminado. Reiniciando...');
+                recognition.start();
+            };
+        } else {
+            console.log('Speech Recognition no soportado en este navegador.');
+        }
+    }
+
+    // Iniciar reconocimiento de voz
+    function startVoiceRecognition() {
+        if (recognition) {
+            recognition.start(); // Reiniciar el reconocimiento
+        }
+    }
+
+    // Crear un nuevo chat
+    document.getElementById('newChatButton').addEventListener('click', createNewChat);
+
+    function createNewChat() {
+        const chatId = new Date().toISOString();
+        currentChatId = chatId;
+        const chatItem = document.createElement('div');
+        chatItem.classList.add('chat-item');
+        chatItem.textContent = `Chat ${chatId.substring(0, 10)}`;
+        document.getElementById('sidebar').appendChild(chatItem);
+    }
+
+    // Enviar la solicitud al servidor
+    function sendRequest() {
+        const input = document.getElementById('userInput').value;
+        if (!input.trim()) return;
+
+        addMessageToChat(input, 'user');
+
+        const requestBody = {
+            model: "anthropic/claude-3.5-haiku:beta",
+            messages: [{ "role": "user", "content": input }]
+        };
+
+        fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+            body: JSON.stringify(requestBody)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const aiResponse = data.choices?.[0]?.message?.content || 'Lo siento, no pude procesar tu solicitud.';
+            addMessageToChat(aiResponse, 'bot');
+        })
+        .catch(error => {
+            console.error('Error al comunicarse con la API:', error);
+            addMessageToChat('Error al comunicarse con la API.', 'bot');
+        });
+        document.getElementById('userInput').value = '';
+    }
+
+    // Añadir el mensaje al chat
+    function addMessageToChat(message, sender) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender === 'user' ? 'userMessage' : 'botMessage'}`;
+        messageDiv.innerHTML = sender === 'user'
+            ? `${message} <i class="fas fa-user-circle"></i>`
+            : `<i class="fas fa-robot"></i> ${message}`;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Llamar a setupVoiceRecognition al cargar la página para asegurarse de que la configuración del micrófono esté lista.
+    setupVoiceRecognition();
+</script>
