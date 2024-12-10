@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseño Moderno en Tema Oscuro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212; /* Fondo más vibrante que el negro puro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif; /* Aplicar Montserrat */
+            color: white; /* Texto blanco */
+            flex-direction: column; /* Para colocar las frases abajo de la animación */
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            height: 150px;
+            width: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a0dad, #32CD32); /* Degradado diagonal */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(106, 13, 173, 0.5);
+            animation: rotate 4s linear infinite;
+        }
+
+        .glow {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            height: 100%;
+            width: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(106, 13, 173, 0.5) 0%, rgba(50, 205, 50, 0.2) 70%);
+            opacity: 0.7;
+            filter: blur(30px);
+            animation: pulsate 2s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulsate {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .phrase {
+            text-align: center;
+            font-size: 20px;
+            max-width: 600px;
+            line-height: 1.6;
+            padding: 10px;
+            display: block; /* Cada frase ocupa una línea completa */
+            border-right: 4px solid white; /* Simula el cursor de escritura */
+            overflow: hidden;
+            opacity: 1; /* Inicialmente visible */
+            transition: opacity 0.5s; /* Transición para el borrado */
+        }
+
+        .dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glow"></div>
+    </div>
+    
+    <div class="phrases" id="random-phrase">
+        <!-- Las frases aleatorias aparecerán aquí -->
+    </div>
+
+    <script>
+        const phrases = [
+            "La inteligencia artificial es el futuro, pero también el presente.",
+            "El aprendizaje automático está cambiando la forma en que interactuamos con el mundo.",
+            "Las máquinas no piensan como los humanos, pero pueden aprender a hacerlo.",
+            "La inteligencia artificial no reemplaza a los humanos, los complementa.",
+            "La IA está mejorando la eficiencia en casi todos los sectores.",
+            "En el futuro, los asistentes virtuales estarán en todas partes.",
+            "La IA nos permite hacer predicciones con una precisión increíble.",
+            "La máquina que aprende nunca se detiene de aprender.",
+            "Cada avance en IA abre nuevas oportunidades en ciencia y tecnología.",
+            "Las redes neuronales son una parte fundamental de la inteligencia artificial moderna.",
+            "La IA está mejorando la personalización de los servicios en línea.",
+            "El futuro de la medicina podría ser impulsado por la inteligencia artificial.",
+            "Las decisiones basadas en IA pueden ser más rápidas y precisas que las humanas.",
+            "La ética en la inteligencia artificial es fundamental para su desarrollo.",
+            "La inteligencia artificial es la clave para resolver muchos de los desafíos globales.",
+            "La IA puede ayudar a detectar patrones que los humanos no pueden ver.",
+            "El procesamiento del lenguaje natural es uno de los avances más emocionantes de la IA.",
+            "Las máquinas inteligentes cambiarán el trabajo tal como lo conocemos.",
+            "La inteligencia artificial está ayudando a crear mundos virtuales más realistas.",
+            "Con la IA, podemos mejorar la seguridad cibernética de maneras antes impensables.",
+            "La inteligencia artificial tiene el potencial de resolver algunos de los problemas más complejos de la humanidad.",
+            "Los robots con IA están comenzando a hacer trabajos peligrosos para los humanos.",
+            "Los avances en IA están acelerando la innovación en todas las industrias.",
+            "La IA está transformando la educación y el aprendizaje personalizado.",
+            "La inteligencia artificial podría ser la clave para crear ciudades más inteligentes.",
+            "La IA puede predecir comportamientos y necesidades humanas de manera precisa.",
+            "La IA está contribuyendo a la creación de arte y música.",
+            "Los sistemas de IA mejoran continuamente su capacidad de tomar decisiones.",
+            "Los algoritmos de IA pueden aprender de los errores para mejorar en el futuro.",
+            "La inteligencia artificial permitirá la automatización de muchos procesos en la industria.",
+            "La IA está cambiando la forma en que las empresas interactúan con los clientes.",
+            "Las máquinas no solo siguen órdenes, sino que también pueden tomar decisiones propias.",
+            "La IA está llevando la investigación científica a nuevas alturas.",
+            "Los vehículos autónomos son un claro ejemplo de cómo la IA cambiará el transporte.",
+            "La IA tiene el poder de hacer que las tareas diarias sean mucho más fáciles.",
+            "La inteligencia artificial puede hacer que el análisis de datos sea mucho más eficiente.",
+            "Los asistentes de inteligencia artificial pueden mejorar nuestra productividad diaria.",
+            "La IA tiene el potencial de revolucionar la atención al cliente.",
+            "Los algoritmos de IA están ayudando a resolver problemas complejos en la economía.",
+            "Las herramientas de IA pueden ayudar a las empresas a tomar decisiones más informadas.",
+            "La inteligencia artificial está comenzando a ser parte integral de nuestras vidas.",
+            "Los sistemas inteligentes están ayudando a mejorar la sostenibilidad del planeta.",
+            "La inteligencia artificial es un campo que sigue evolucionando a un ritmo vertiginoso.",
+            "La IA está transformando la forma en que consumimos contenido en línea.",
+            "Los asistentes de voz con IA se están convirtiendo en una herramienta cotidiana.",
+            "La inteligencia artificial puede mejorar la forma en que gestionamos las ciudades.",
+            "La IA está abriendo nuevas puertas en la creación de software inteligente.",
+            "La IA no tiene emociones, pero puede aprender a interpretar las emociones humanas.",
+            "Los avances en IA están redefiniendo lo que significa ser humano.",
+            "La inteligencia artificial nos permite hacer descubrimientos científicos más rápidamente.",
+            "Las máquinas inteligentes son capaces de realizar tareas que antes solo los humanos podían hacer.",
+            "La IA está mejorando las capacidades de los dispositivos móviles.",
+            "El aprendizaje profundo está llevando la inteligencia artificial a nuevas alturas.",
+            "La IA nos está ayudando a tomar decisiones informadas con grandes cantidades de datos.",
+            "Las tecnologías de IA están impulsando la cuarta revolución industrial.",
+            "La inteligencia artificial está empezando a ser parte crucial de la agricultura.",
+            "Las máquinas que aprenden son una de las promesas más emocionantes de la ciencia moderna.",
+            "La IA está haciendo posible un futuro más eficiente y conectado."
+        ];
+
+        function showRandomPhrase() {
+            const randomIndex = Math.floor(Math.random() * phrases.length);
+            const phrase = phrases[randomIndex];
+            const phraseElement = document.getElementById("random-phrase");
+            
+            // Crear un nuevo elemento para la frase
+            const newPhraseElement = document.createElement("div");
+            newPhraseElement.className = "phrase";
+            phraseElement.appendChild(newPhraseElement);
+
+            // Iniciar la animación de escritura
+            const duration = phrase.length * 50; // Duración más rápida
+            newPhraseElement.style.animation = "none"; // Reiniciar la animación
+            newPhraseElement.textContent = ''; // Limpiar el texto antes de empezar
+
+            // Asignar la frase aleatoria y configurar la animación
+            setTimeout(() => {
+                // Escribir la frase
+                let index = 0;
+                const typingInterval = setInterval(() => {
+                    newPhraseElement.textContent += phrase[index];
+                    index++;
+                    if (index >= phrase.length) {
+                        clearInterval(typingInterval); // Terminar el intervalo una vez que se complete la frase
+                        
+                        // Agregar el punto parpadeante
+                        const dotElement = document.createElement("span");
+                        dotElement.className = "dot";
+                        newPhraseElement.appendChild(dotElement);
+
+                        // Limpiar la frase después de un breve retraso
+                        setTimeout(() => {
+                            newPhraseElement.style.opacity = 0; // Desvanece la frase
+                            setTimeout(() => {
+                                phraseElement.removeChild(newPhraseElement); // Elimina la frase luego de desvanecerse
+                                showRandomPhrase(); // Muestra una nueva frase
+                            }, 500); // Tiempo para eliminar la frase
+                        }, 2000); // Tiempo para que se muestre la frase antes de eliminarla
+                    }
+                }, 50); // Velocidad de escritura
+            }, 100); // Asigna un leve retraso antes de comenzar a escribir
+        }
+
+        // Mostrar una frase aleatoria al cargar la página
+        showRandomPhrase();
+    </script>
+</body>
+</html>
